@@ -1,37 +1,29 @@
 import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 
 public class calculadora {
     public static void main(String[] args) throws IOException {
-        if (args.length != 2) {
-            System.err.println("Debe ingresar dos numeros.");
-            System.exit(1);
-        }   
 
-        int x = Integer.parseInt(args[0]);
-        int y= Integer.parseInt(args[0]);
+        ServerSocket server = new ServerSocket(4444);
+        Socket sc;
+        boolean con = true;
 
-        int suma = suma(x,y);
-        System.out.println("El resultado de la suma es: " + suma);
+        while (con){
+            sc = server.accept();
 
-        hilo hilo1 = new hilo();
-        hilo1.start();
-    }
+            DataInputStream sockIn = new DataInputStream(sc.getInputStream());
+            DataOutputStream sockOut = new DataOutputStream(sc.getOutputStream());
 
+            sockOut.writeUTF("Realize las poreaciones a continuacion: ");
+            String operacion = sockIn.readUTF();
 
-    public static int suma (int x, int y){
-        return x + y;
-    }
+            calculadoraHilo hijo = new calculadoraHilo(sockIn, sockOut, operacion);
+            hijo.start();
 
-    public static int resta (int x, int y){
-        return x - y;
-    }
+            System.out.println("Conectado con: " + operacion);
+        }
 
-    public static int multiplicacion (int x, int y){
-        return x * y;
-    }
-
-    public static int division (int x, int y){
-        return x / y;
     }
 }
