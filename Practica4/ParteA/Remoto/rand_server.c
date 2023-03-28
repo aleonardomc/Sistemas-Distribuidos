@@ -10,15 +10,18 @@ void *
 inicializa_random_1_svc(dupla_int *argp, struct svc_req *rqstp)
 {
 	static char * result;
+
 	srandom(argp->a);
+
 	return (void *) &result;
 }
 
-double *
+long *
 obtiene_siguiente_random_1_svc(void *argp, struct svc_req *rqstp)
 {
-	static double  result;
+	static int result;
 
 	result = random();
+
 	return &result;
 }

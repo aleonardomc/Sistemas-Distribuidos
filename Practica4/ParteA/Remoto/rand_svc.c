@@ -39,7 +39,7 @@ rand_prog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 
 	case OBTIENE_SIGUIENTE_RANDOM:
 		_xdr_argument = (xdrproc_t) xdr_void;
-		_xdr_result = (xdrproc_t) xdr_double;
+		_xdr_result = (xdrproc_t) xdr_long;
 		local = (char *(*)(char *, struct svc_req *)) obtiene_siguiente_random_1_svc;
 		break;
 

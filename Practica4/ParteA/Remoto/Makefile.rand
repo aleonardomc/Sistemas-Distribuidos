@@ -20,9 +20,9 @@ OBJECTS_CLNT = $(SOURCES_CLNT.c:%.c=%.o) $(TARGETS_CLNT.c:%.c=%.o)
 OBJECTS_SVC = $(SOURCES_SVC.c:%.c=%.o) $(TARGETS_SVC.c:%.c=%.o)
 # Compiler flags 
 
-CFLAGS += -g -DRPC_SVC_FG
+CFLAGS += -g 
 LDLIBS += -lnsl
-RPCGENFLAGS = -C
+RPCGENFLAGS = 
 
 # Targets 
 

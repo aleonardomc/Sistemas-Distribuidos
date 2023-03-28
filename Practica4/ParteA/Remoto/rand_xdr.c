@@ -12,5 +12,7 @@ xdr_dupla_int (XDR *xdrs, dupla_int *objp)
 
 	 if (!xdr_int (xdrs, &objp->a))
 		 return FALSE;
+	 if (!xdr_int (xdrs, &objp->b))
+		 return FALSE;
 	return TRUE;
 }

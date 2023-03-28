@@ -24,15 +24,15 @@ inicializa_random_1(dupla_int *argp, CLIENT *clnt)
 	return ((void *)&clnt_res);
 }
 
-double *
+long *
 obtiene_siguiente_random_1(void *argp, CLIENT *clnt)
 {
-	static double clnt_res;
+	static long clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
 	if (clnt_call (clnt, OBTIENE_SIGUIENTE_RANDOM,
 		(xdrproc_t) xdr_void, (caddr_t) argp,
-		(xdrproc_t) xdr_double, (caddr_t) &clnt_res,
+		(xdrproc_t) xdr_long, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
 	}

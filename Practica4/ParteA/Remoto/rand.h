@@ -16,6 +16,7 @@ extern "C" {
 
 struct dupla_int {
 	int a;
+	int b;
 };
 typedef struct dupla_int dupla_int;
 
@@ -27,8 +28,8 @@ typedef struct dupla_int dupla_int;
 extern  void * inicializa_random_1(dupla_int *, CLIENT *);
 extern  void * inicializa_random_1_svc(dupla_int *, struct svc_req *);
 #define OBTIENE_SIGUIENTE_RANDOM 2
-extern  double * obtiene_siguiente_random_1(void *, CLIENT *);
-extern  double * obtiene_siguiente_random_1_svc(void *, struct svc_req *);
+extern  long * obtiene_siguiente_random_1(void *, CLIENT *);
+extern  long * obtiene_siguiente_random_1_svc(void *, struct svc_req *);
 extern int rand_prog_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */
@@ -36,8 +37,8 @@ extern int rand_prog_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 extern  void * inicializa_random_1();
 extern  void * inicializa_random_1_svc();
 #define OBTIENE_SIGUIENTE_RANDOM 2
-extern  double * obtiene_siguiente_random_1();
-extern  double * obtiene_siguiente_random_1_svc();
+extern  long * obtiene_siguiente_random_1();
+extern  long * obtiene_siguiente_random_1_svc();
 extern int rand_prog_1_freeresult ();
 #endif /* K&R C */
 
