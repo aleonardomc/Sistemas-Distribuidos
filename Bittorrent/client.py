@@ -9,7 +9,6 @@ import argparse
 import sys
 import os
 from pathlib import Path
-import time
 
 def download_torrent(link, save_path):
     ses = lt.session()
@@ -22,11 +21,28 @@ def download_torrent(link, save_path):
 
     print(f"Starting download for: {handle.name()}")
 
+    paused = False
+
     while handle.status().state != lt.torrent_status.seeding:
         s = handle.status()
         state_str = ['queued', 'checking', 'downloading metadata', 'downloading', 'finished', 'seeding', 'allocating']
         print(f"Progress: {s.progress * 100:.2f}%  Down: {s.download_rate / 1000:.1f} kB/s  Up: {s.upload_rate / 1000:.1f} kB/s  Peers: {s.num_peers}  State: {state_str[s.state]}")
-        time.sleep(1)  # Esperar 1 segundo antes de verificar el estado nuevamente
+
+        threading.Event().wait(1)  # Esperar 1 segundo antes de verificar el estado nuevamente
+
+        # Preguntar si se desea pausar o reanudar la descarga
+        if not paused:
+            pause_input = input("¿Desea pausar la descarga? (S/N): ")
+            if pause_input.lower() == 's':
+                ses.pause()
+                paused = True
+                print("Descarga pausada")
+        else:
+            resume_input = input("¿Desea reanudar la descarga? (S/N): ")
+            if resume_input.lower() == 's':
+                ses.resume()
+                paused = False
+                print("Descarga reanudada")
 
     print(f"Download completed for: {handle.name()}")
 
