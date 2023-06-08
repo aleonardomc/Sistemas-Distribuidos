@@ -3,48 +3,51 @@
 # https://www.libtorrent.org/python_binding.html
 
 import libtorrent as lt
-import time
-import datetime
+import threading
+import argparse
+import sys
 
-link = input("Ingresa el archivo magnent: ")
+def download_torrent(link, save_path):
+    ses = lt.session()
+    ses.listen_on(6881, 6891)
+    params = {
+        'save_path': save_path
+    }
+    handle = lt.add_magnet_uri(ses, link, params)
+    ses.start_dht()
 
-ses = lt.session()
-ses.listen_on(6881, 6891)
-params = {
-    'save_path': '/home/leo/Escritorio/SD/Bittorrent/Archivos'}
-"""
-        'storage_mode': lt.storage_mode_t(2),
-        'paused': True,
-        'auto_managed': True,
-        'duplicate_is_error': True}
-"""
+    print(f"Starting download for: {handle.name()}")
 
-print(link)
+    while handle.status().state != lt.torrent_status.seeding:
+        s = handle.status()
+        state_str = ['queued', 'checking', 'downloading metadata', 'downloading', 'finished', 'seeding', 'allocating']
+        print(f"Progress: {s.progress * 100:.2f}%  Down: {s.download_rate / 1000:.1f} kB/s  Up: {s.upload_rate / 1000:.1f} kB/s  Peers: {s.num_peers}  State: {state_str[s.state]}")
+        threading.Event().wait(5)  # Esperar 5 segundos antes de verificar el estado nuevamente
 
-handle = lt.add_magnet_uri(ses, link, params)
-ses.start_dht()
+    print(f"Download completed for: {handle.name()}")
 
-begin = time.time()
-print(datetime.datetime.now())
+# Configurar el argumento de línea de comandos
+parser = argparse.ArgumentParser(description='Torrent Client')
+parser.add_argument('save_path', type=str, help='Directorio de descarga')
 
-print ('Downloading Metadata...')
-while (not handle.has_metadata()):
-    time.sleep(1)
-print ('Got Metadata, Starting Torrent Download...')
+# Obtener el directorio de descarga del argumento de línea de comandos
+args = parser.parse_args(sys.argv[1:])
+save_path = args.save_path
 
-print("Starting", handle.name())
+# Solicitar los enlaces magnet al usuario
+links = []
+num_torrents = int(input("Ingrese la cantidad de torrents a descargar: "))
+for i in range(num_torrents):
+    link = input(f"Ingrese el enlace magnet #{i+1}: ")
+    links.append(link)
 
-while (handle.status().state != lt.torrent_status.seeding):
-    s = handle.status()
-    state_str = ['queued', 'checking', 'downloading metadata', \
-            'downloading', 'finished', 'seeding', 'allocating']
-    print ('%.2f%% complete (down: %.1f kb/s up: %.1f kB/s peers: %d) %s ' % \
-            (s.progress * 100, s.download_rate / 1000, s.upload_rate / 1000, \
-            s.num_peers, state_str[s.state]))
-    time.sleep(5)
+# Crear hilos para descargar los torrents en paralelo
+threads = []
+for link in links:
+    thread = threading.Thread(target=download_torrent, args=(link, save_path))
+    thread.start()
+    threads.append(thread)
 
-end = time.time()
-print(handle.name(), "COMPLETE")
-
-print("Elapsed Time: ",int((end-begin)//60),"min :", int((end-begin)%60), "sec")
-print(datetime.datetime.now())  
+# Esperar a que todos los hilos terminen
+for thread in threads:
+    thread.join()
