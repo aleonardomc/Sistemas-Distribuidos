@@ -15,23 +15,23 @@ def download_torrent(link, save_path):
     ses.listen_on(6881, 6891)
     params = {
         'save_path': save_path
+        
     }
     handle = lt.add_magnet_uri(ses, link, params)
     ses.start_dht()
 
     print(f"Starting download for: {handle.name()}")
-
     paused = False
 
     while handle.status().state != lt.torrent_status.seeding:
         s = handle.status()
         state_str = ['queued', 'checking', 'downloading metadata', 'downloading', 'finished', 'seeding', 'allocating']
-        print(f"Progress: {s.progress * 100:.2f}%  Down: {s.download_rate / 1000:.1f} kB/s  Up: {s.upload_rate / 1000:.1f} kB/s  Peers: {s.num_peers}  State: {state_str[s.state]}")
-
+        print(f"\rProgress: {s.progress * 100:.2f}%  Down: {s.download_rate / 1000:.1f} kB/s  Up: {s.upload_rate / 1000:.1f} kB/s  Peers: {s.num_peers}  Seeds: {s.num_seeds}  Num Pieces: {s.num_pieces}  List Seeds: {s.list_seeds}   State: {state_str[s.state]}     ", end = "")
+        
         threading.Event().wait(1)  # Esperar 1 segundo antes de verificar el estado nuevamente
 
         # Preguntar si se desea pausar o reanudar la descarga
-        if not paused:
+        """if not paused:
             pause_input = input("¿Desea pausar la descarga? (S/N): ")
             if pause_input.lower() == 's':
                 ses.pause()
@@ -43,12 +43,11 @@ def download_torrent(link, save_path):
                 ses.resume()
                 paused = False
                 print("Descarga reanudada")
-
+        """
     print(f"Download completed for: {handle.name()}")
 
 # Obtener el directorio de descarga por defecto (carpeta de descargas del usuario de Windows)
 default_save_path = str(Path.home() / "Downloads")
-
 # Configurar el argumento de línea de comandos
 parser = argparse.ArgumentParser(description='Torrent Client')
 parser.add_argument('save_path', type=str, nargs='?', default=default_save_path, help='Directorio de descarga (opcional)')
